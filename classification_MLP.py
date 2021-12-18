@@ -17,7 +17,7 @@ from PIL import Image
 from keras.datasets import mnist
 from tensorflow.keras.utils import to_categorical
 from keras.models import Sequential
-from keras.layers import Dense, Dropout
+from keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras import optimizers
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
@@ -48,7 +48,7 @@ def main():
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     batch_size = 500
-    epochs = 10
+    epochs = 50
     learn_model(dir_path, model, x_train, y_train, batch_size, epochs)
 
     # Load the model.
@@ -106,14 +106,18 @@ def create_model(input_shape, output_shape):
     model = Sequential()
     model.add(Dense(512, input_shape=(input_shape,)))
     model.add(Dropout(0.3))
+    model.add(BatchNormalization())
     model.add(Dense(512, activation='relu'))
     model.add(Dropout(0.3))
+    model.add(BatchNormalization())
     model.add(Dense(output_shape, activation='softmax'))
 
+    loss = 'categorical_crossentropy'
     opt = optimizers.Adam(lr=0.01)  # Set the learning rate to optimizers.
-    model.compile(loss='categorical_crossentropy',  # Used in learning.
+    met = ['acc']
+    model.compile(loss=loss,  # Used in learning.
                   optimizer=opt,
-                  metrics=['acc'],  # Not used in learning.
+                  metrics=met,  # Not used in learning.
                   )
 
     model.summary()

@@ -16,7 +16,7 @@ from PIL import Image
 
 from keras.datasets import mnist
 from tensorflow.keras.utils import to_categorical
-from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout ,BatchNormalization
 from keras.models import Model
 from tensorflow.keras import optimizers
 from keras.callbacks import ModelCheckpoint
@@ -48,7 +48,7 @@ def main():
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     batch_size = 500
-    epochs = 10
+    epochs = 30
     learn_model(dir_path, model, x_train, y_train, batch_size, epochs)
 
     # Load the model.
@@ -109,18 +109,22 @@ def create_model(input_shape, output_shape):
     x = Conv2D(16, (3, 3), padding='same', activation='relu')(input)
     x = MaxPooling2D((2, 2), data_format='channels_last')(x)
     x = Dropout(0.3)(x)
+    x = BatchNormalization()(x)
     x = Conv2D(32, (3, 3), padding='same', activation='relu')(x)
     x = MaxPooling2D((2, 2), data_format='channels_last')(x)
     x = Flatten()(x)
+    x = BatchNormalization()(x)
     x = Dense(512, activation='relu')(x)
     x = Dropout(0.3)(x)
     output = Dense(output_shape, activation='softmax')(x)
     model = Model(inputs=input, outputs=output)
 
+    loss = 'categorical_crossentropy'
     opt = optimizers.Adam(lr=0.01)  # Set the learning rate to optimizers.
-    model.compile(loss='categorical_crossentropy',  # Used in learning.
+    met = ['acc']
+    model.compile(loss=loss,  # Used in learning.
                   optimizer=opt,
-                  metrics=['acc'],  # Not used in learning.
+                  metrics=met,  # Not used in learning.
                   )
 
     model.summary()
