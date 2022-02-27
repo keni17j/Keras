@@ -16,4 +16,4 @@
 - [Twitter](https://twitter.com/keni17j)
 
 # License
-MIT
+"Repository name" is under [MIT license](https://en.wikipedia.org/wiki/MIT_License).
